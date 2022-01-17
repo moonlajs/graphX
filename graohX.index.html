@@ -1,0 +1,229 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>JSXGraph template</title>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    <link href="https://cdn.jsdelivr.net/npm/jsxgraph@1.1.0/distrib/jsxgraph.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.1.0/distrib/jsxgraphcore.js" type="text/javascript" charset="UTF-8"></script>
+    <!-- The next line is optional: MathJax -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+
+<style>
+
+body{
+	
+	margin:0
+
+}
+
+</style>
+
+ </head>
+  <body>
+
+  <div>
+  <div id="box2" class="jxgbox" style="width:100%; height:600px;"></div>
+  </div>
+  
+  <script>
+   
+  JXG.Options.text.useMathJax = true;
+  var board = JXG.JSXGraph.initBoard('jxgbox', {boundingbox: [-10, 10, 10, -3], axis:true});
+    
+  var gr = board.create('grid');
+
+	
+  var m = board.create('slider', [[8,1],[8,5],[0,1,4]],{snapWidth: 0.1, precision: 1,
+                                                        ticks: { drawLabels: true, label: {position: 'rt', offset: [10,0]}},
+                                                        name: "m"});
+  var t = board.create('slider', [[-8,1],[-8,5],[-2,0,6]],{snapWidth: 0.1, precision: 1,
+                                                           ticks: { drawZero: true, drawLabels: true, ticksDistance: 1,
+                                                                    minTicksDistance: 5, // insertTicks: true,
+                                                                   tickEndings: [1,0],
+                                                                   label: {position: 'lft', offset: [-20,0]}},
+                                                            name: "t"});
+  var tval = function(){return t.Value();};
+  var T = board.create('point', [0,tval], {name: "T", label: "T", strokeColor: 'purple', face: 'cross'});
+  var mval = function(){return m.Value();};
+  var linF0 = function(x){return mval()*x};
+  var linF = function(x){return mval()*x + tval()};
+  //虚线，用来表示原始位置
+  var G0 = board.create('functiongraph',[linF0,-5,5], {strokeWidth: 1, dash: 2});
+  var G = board.create('functiongraph',[linF,-5,5], {strokeWidth: 2});
+
+  var ftextval = function(){
+    var vz = "";
+    var tv = "";
+    if (tval() >= 0.0) {
+		if (tval() == 0.0){
+			tv = ""; vz = "";
+		} 
+		else {
+			vz = "+"; tv = JXG.toFixed(tval(),1);
+		}
+	}
+      else {
+	  vz = ""; tv = JXG.toFixed(tval(),1);
+	};
+    return "\\[f(x)="+ JXG.toFixed(mval(),1) + " \\cdot x" + vz + tv + "\\]";
+  };
+  var ftext = board.create('text', [-9.2,8.0,ftextval], {fontSize: 18, color:'blue', cssStyle: 'background-color: rgb(255,255,255)'});
+  //两点之间的线
+  var dt = board.create('segment',[[0,0],[0,tval]],{strokeColor: 'purple', strokeWidth: 5});
+  //红点 In any case the point will be projected on the glide object.在任何情况下，该点都将投影到滑动对象上
+  var A = board.create('glider', [-2,10,G], {label: {offset: [0,-15]}});
+  //切线; 正切;
+ // var tangent = board.create('tangent', [A]);
+  //var st = board.create('slopetriangle', [tangent], {toppoint: {face: 'plus', withLabel: false}});
+
+  //var p2 = board.create('glider', [-1.0, 1.5,G]);
+ // p2.startAnimation(-1, 20, 200);
+  </script>
+
+
+<script>
+
+ var ftextvalsin = function(){
+    var vz = "";
+    var tv = "";
+   
+    return "\\[f(x)=0.2 \\cdot x \\cdot x + Math.sin(x) \\]";
+  };
+  //kx*x+tx+c
+var brd = JXG.JSXGraph.initBoard('box', {axis:true, boundingbox: [-10, 10, 10, -2]});
+var n = brd.create('slider',[[1,2],[6,3],[1,15,16]],{name:'n',snapWidth:1});
+var f = function(x){ return 0.2*x*x+2.0*Math.sin(x); }
+var plot = brd.create('functiongraph',[f], {strokeWidth:1,strokeOpacity:0.3});
+var ftext = brd.create('text', [-9.2,8.0,ftextvalsin], {fontSize: 18, color:'blue', cssStyle: 'background-color: rgb(255,255,255)'});
+
+var start = -3.0;
+var end = 5.0;
+var sc = brd.create('curve',[[0],[0]],{dash:1,strokeWidth:1,strokeColor:'red'});
+sc.updateDataArray = function() {
+   var i;
+   var m = n.Value();
+   var d = (end-start)/m;
+   this.dataX = [];
+   this.dataY = [];
+   this.dataX[0] = start;   
+   this.dataY[0] = f(start);   
+   for (i=1;i<=m;i++) {
+     this.dataX.push(start+i*d);   
+     this.dataY.push(f(start+(i-1)*d));   
+     this.dataX.push(start+i*d);   
+     this.dataY.push(f(start+i*d));   
+   }  
+}
+var approx = brd.create('curve',[[0],[0]], {strokeColor:'red'});
+approx.updateDataArray = function() {
+   var i;
+   var m = n.Value();
+   var d = (end-start)/m;
+   this.dataX = [];
+   this.dataY = [];
+   this.dataX[0] = start;   
+   this.dataY[0] = f(start);   
+   for (i=1;i<=m;i++) {
+     this.dataX.push(start+i*d);   
+     this.dataY.push(f(start+i*d));   
+   }  
+}
+
+brd.create('text',[-6,-1,function(){ 
+   var i,s,f0,f1;
+   var m = n.Value();
+   var d = (end-start)/m;
+   s = 0.0;
+   f0 = f(start);
+   for (i=1;i<=m;i++) {
+     f1 = f(start+i*d);
+     s += Math.sqrt(d*d+(f1-f0)*(f1-f0));
+     f0 = f1;
+   }  
+   return 'Length='+s.toFixed(4); }]);
+brd.update();
+
+
+
+</script>
+
+
+<script>
+
+ var ftextvalsin2 = function(){
+    var vz = "";
+    var tv = "";
+	var plus = '+';var pluss = '+';
+   var a0 = JXG.toFixed(a.Value(),1);
+   var b0 = JXG.toFixed(b.Value(),1);
+   var c0 = JXG.toFixed(c.Value(),1);
+    if(parseFloat(b0)<0){
+	plus = ''
+   }
+    if(parseFloat(c0)<0){
+	pluss = ''
+   }
+   if(a0 === '1.0'){a0= ''}else{a0= a0 + ' \\cdot '}
+   if(b0 === '1.0'){b0= ''}else{b0= b0 + ' \\cdot '}
+  
+    return "\\[f(x)=" + a0 + "x \\cdot x"+ plus + b0 +" x " + pluss +c0+" \\]";
+  };
+  //ax²+bx+c=0（a≠0）
+var brd2 = JXG.JSXGraph.initBoard('box2', {axis:true, boundingbox: [-10, 10, 10, -10]});
+var a = brd2.create('slider',[[6,8],[8,8],[-10,1,10]],{name:'a',snapWidth:1});
+var b = brd2.create('slider',[[6,6],[8,6],[-10,1,10]],{name:'b',snapWidth:1});
+var c = brd2.create('slider',[[6,4],[8,4],[-10,0,10]],{name:'c',snapWidth:1});
+var aval = function(){return a.Value();};
+var bval = function(){return b.Value();};
+var cval = function(){return c.Value();};
+var f = function(x){ return a.Value()*x*x+b.Value()*x+c.Value(); }
+var plot = brd2.create('functiongraph',[f], {strokeWidth:1,strokeOpacity:0.3});
+var ftext = brd2.create('text', [-9.2,8.0,ftextvalsin2], {fontSize: 16, color:'blue', cssStyle: 'background-color: rgb(255,255,255)'});
+//var m = brd2.create('slider', [[4,1],[4,5],[0,1,4]],{snapWidth: 0.1, precision: 1, ticks: { drawLabels: true, label: {position: 'rt', offset: [10,0]}},name: "m"});
+var textDelta = brd2.create('text', [-9.2,6.0,function(){
+
+if(aval() === 0){
+return ''
+}
+
+
+var delta = bval()* bval() - 4*aval()*cval();
+var greater = '< 0（无实数根）'
+if(delta > 0){
+greater = '> 0（两个实数根）'
+}else if(delta === 0){
+greater = '= 0 (一个实数根)'
+}
+ return "\\[Δ=b \\cdot b - 4ac = "+ delta + greater + " \\]";
+}], {fontSize: 18, color:'blue', cssStyle: 'background-color: rgb(255,255,255)'});
+
+
+//x=[-b±√(b²-4ac)]/2a
+
+var x1val = function(){
+if(a.Value() ===0){
+	return  1
+}
+return ((-b.Value()) - Math.sqrt(b.Value() * b.Value() - 4 * a.Value() * c.Value())) / (2 * a.Value())
+
+};
+var x2val = function(){
+
+if(a.Value() ===0){
+	return  1
+}
+return ((-b.Value()) + Math.sqrt(b.Value() * b.Value() - 4 * a.Value() * c.Value())) / (2 * a.Value());};
+var p1 = brd2.create('point', [x1val, 0], {name: x1val, label: "T", strokeColor: 'purple', face: 'cross'});
+var p2 = brd2.create('point', [x2val, 0], {name: x2val, label: "T", strokeColor: 'purple', face: 'cross'});
+
+
+
+//一元二次方程 的根与根的判别式 有如下关系：
+//①当 时，方程有两个不相等的实数根；
+//②当 时，方程有两个相等的实数根；
+//③当 时，方程无实数根，但有2个共轭复根。
+
+</script>
+  </body>
+</html
